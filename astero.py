@@ -37,7 +37,7 @@ pl.clf()
 pl.savefig("data.png")
 
 # BOOM.
-freq_muH = np.exp(np.linspace(np.log(50), np.log(250), 50000))
+freq_muH = np.exp(np.linspace(np.log(25), np.log(1000), 50000))
 omega = freq_muH * 1e-6 * 86400. * (2 * np.pi)
 amp = lombscargle(data[0], data[1], omega)
 
