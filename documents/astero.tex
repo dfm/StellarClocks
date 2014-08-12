@@ -121,21 +121,28 @@ Our general approach is to take periodograms of the data.
 The idea is that if we distort the time axis of the data---effectively
 ``un-doing'' the time-delay effects created by the orbit of a
 planetary companion---the periodogram will get more informative as the
-distortion better matches the inverse of that induced by the planet.
+distortion better matches the inverse of that induced by reaction of
+the star to the movement of the planet.
 
 The method is based on the important fact that a periodogram is
-related (beautifully) to a likelihood function (\citealt{bretthorst}).
+related (beautifully) to a likelihood function (\citealt{bretthorst}):
 \begin{eqnarray}
 \ln p(d\given P_m) &=& \frac{C(P_m)}{\sigma^2} + \mbox{const}
 \quad,
 \end{eqnarray}
-where $d$ is the light-curve data, $P_m$ is the period of a putative
+where $p(d\given P_m)$ is a likelihood function, $d$ is the
+light-curve data on the target star, $P_m$ is the period of a putative
 sinusoidal signal---here an asteroseismology mode $m$---generating the
 data, $C(P_m)$ is the periodogram (best-fit squared amplitude as a
 function of period $P_m$) and $\sigma^2$ is the per-datum noise
 variance (assumed Gaussian, independent, and all identical).
+The periodogram $C(P)$ is defined to be the square of the best-fit
+amplitude, of a sinusoidal signal with arbitrary phase but period $P$,
+fit by least squares to the data $d$, after subtraction of the mean
+level of the data (that is, fit to zero-mean data).
 
-...define $C(P)$ here.
+...Figure XXX shows a blow-up of the periodogram of the \Kepler\ data
+on target star YYY near one of its modes.
 
 Of course we are not really looking for the modes at periods $P_m$;
 for our purposes, asteroseismology itself is a ``solved problem''.
@@ -148,7 +155,8 @@ argument of perhielion $\varpi$ and so on.
 
 ...define $C(P\given \omega)$ here.
 
-...describe finding a peak and measuring it as a function of $\omega$.
+...describe finding a peak.  And then measuring that peak as a
+function of $\omega$.
 
 ...Information coming from multiple modes can be combined.  Describe
 this.
