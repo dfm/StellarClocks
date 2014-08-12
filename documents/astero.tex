@@ -4,6 +4,7 @@
 \newcounter{affil}
 \newcommand{\project}[1]{\textsl{#1}}
 \newcommand{\Kepler}{\project{Kepler}}
+\newcommand{\given}{\,|\,}
 \newcommand{\DeltaTKepler}{\Delta T_{\mathrm{Kep}}}
 
 \begin{document}
@@ -85,8 +86,13 @@ measure of the speed of light.)
 
 In principle, the full Keplerian eccentric orbit is encoded in the
 time history, so in principle we can measure the eccentricity and
-orientation of the argument of perihelion.
-This would take very good data, of course.
+orientation of the argument of perihelion, up to a projection (on to
+the line of sight).
+The time-delay function of time is just the integral of the radial
+velocity function of time; anything that can be inferred from
+radial-velocity data can be inferred from time-delay data.
+That said, the sensitivities to noise will be different, and good
+inferences will require very good time-delay data.
 
 Given a set of oscillation modes $m$ with oscillation periods $P_m$,
 our ability to find a long-period signal (meaning a signal which
@@ -111,14 +117,41 @@ Hence the value of the millisecond pulsars!
 
 \section{Methods}
 
-...The fundamental method will be based on the fact that a periodogram
-is related (beautifully) to a likelihood function
-(\citealt{bretthorst}).
+Our general approach is to take periodograms of the data.
+The idea is that if we distort the time axis of the data---effectively
+``un-doing'' the time-delay effects created by the orbit of a
+planetary companion---the periodogram will get more informative as the
+distortion better matches the inverse of that induced by the planet.
 
-...This, plus a small, periodic distortion of the time axis, will
-permit a likelihood function for the time-delay function.
+The method is based on the important fact that a periodogram is
+related (beautifully) to a likelihood function (\citealt{bretthorst}).
+\begin{eqnarray}
+\ln p(d\given P_m) &=& \frac{C(P_m)}{\sigma^2} + \mbox{const}
+\quad,
+\end{eqnarray}
+where $d$ is the light-curve data, $P_m$ is the period of a putative
+sinusoidal signal---here an asteroseismology mode $m$---generating the
+data, $C(P_m)$ is the periodogram (best-fit squared amplitude as a
+function of period $P_m$) and $\sigma^2$ is the per-datum noise
+variance (assumed Gaussian, independent, and all identical).
 
-...Multiple modes can be combined.
+...define $C(P)$ here.
+
+Of course we are not really looking for the modes at periods $P_m$;
+for our purposes, asteroseismology itself is a ``solved problem''.
+We are looking for a time-delay function $h(t\given \omega)$ such that
+if we un-delay the data by this function, each asteroseismology mode
+$m$ becomes more faithfully represented in the data.
+Here $\omega$ is the set of exoplanet parameters, which include a
+time-delay amplitude $T_0$, a period $P$, an eccentricity $e$, an
+argument of perhielion $\varpi$ and so on.
+
+...define $C(P\given \omega)$ here.
+
+...describe finding a peak and measuring it as a function of $\omega$.
+
+...Information coming from multiple modes can be combined.  Describe
+this.
 
 ...Approximations abound.
 
