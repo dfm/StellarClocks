@@ -6,6 +6,7 @@ Copyright 2014 David W. Hogg (NYU).
 import numpy as np
 import matplotlib.pylab as plt
 import emcee
+import triangle
 
 def trapezoid(times, period, offset, depth, duration, gress):
     fractions = np.zeros_like(times)
@@ -41,14 +42,15 @@ def ln_like(data, pars):
 def ln_prior(pars):
     return 0.
 
-def lnprob(pars, data):
+def ln_posterior(pars, data):
     lp = ln_prior(pars)
     if not np.isfinite(lp):
         return -np.Inf
     return lp + ln_like(data, pars)
 
 if __name__ == "__main__":
-    times = np.arange(0., 90., 1.0 / 48.) # 30-min cadence in d
+    np.random.seed(42)
+    times = np.arange(0., 4.1 * 365, 1.0 / 48.) # 30-min cadence in d
     exptime = ((1.0 / 24.) / 60.) * 27. # 27 min in d
     sigma = 1.e-5
     truepars = np.array([6.5534, 31.55, 0.005235, 0.32322, 0.05232])
@@ -58,8 +60,19 @@ if __name__ == "__main__":
     ivars = np.zeros_like(fluxes) + 1. / (sigma ** 2)
     data = np.array([times, fluxes, ivars])
     initpars = truepars
-    ndim, nwalkers = len(initpars), 128
+    ndim, nwalkers = len(initpars), 16
     pos = [initpars + 1e-5*np.random.randn(ndim) for i in range(nwalkers)]
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(data,))
-    sampler.run_mcmc(pos, 512)
-    
+    nburn = 5
+    for burn in range(nburn):
+        nlinks = 128
+        print "burning %d, ndim %d, nwalkers %d, nlinks %d" % (burn, ndim, nwalkers, nlinks)
+        sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_posterior, args=(data,))
+        sampler.run_mcmc(pos, nlinks)
+        chain = sampler.flatchain
+        low = 3 * len(chain) / 4
+        nwalkers *= 2
+        pos = chain[np.random.randint(low, high=len(chain), size=nwalkers)]
+    fig = triangle.corner(sampler.flatchain,
+                          labels=["period", "offset", "depth", "duration", "gress"],
+                          truths=truepars)
+    fig.savefig("hotcold_triangle.png")
