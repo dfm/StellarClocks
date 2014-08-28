@@ -5,6 +5,7 @@ Copyright 2014 David W. Hogg (NYU).
 
 import numpy as np
 import matplotlib.pylab as plt
+import emcee
 
 def trapezoid(times, period, offset, depth, duration, gress):
     fractions = np.zeros_like(times)
@@ -25,7 +26,7 @@ def integrate_fractions(times, exptime, period, offset, depth, duration, gress, 
     bigfracs = get_fractions(bigtimes, period, offset, depth, duration, gress)
     return np.mean(bigfracs, axis=1)
 
-def observe_star(times, exptime, period, offset, depth, duration, gress, sigma, K=5):
+def observe_star(times, exptime, sigma, period, offset, depth, duration, gress, K=21):
     fluxes = np.ones_like(times)
     fluxes *= (1. - integrate_fractions(times, exptime, period, offset, depth, duration, gress, K))
     fluxes += sigma * np.random.normal(size=fluxes.shape)
@@ -40,14 +41,25 @@ def ln_like(data, pars):
 def ln_prior(pars):
     return 0.
 
+def lnprob(pars, data):
+    lp = ln_prior(pars)
+    if not np.isfinite(lp):
+        return -np.Inf
+    return lp + ln_like(data, pars)
+
 if __name__ == "__main__":
     times = np.arange(0., 90., 1.0 / 48.) # 30-min cadence in d
     exptime = ((1.0 / 24.) / 60.) * 27. # 27 min in d
     sigma = 1.e-5
-    fluxes = observe_star(times, exptime, 6.5534, 31.55, 0.005235, 0.32322, 0.05232, sigma, K=21)
+    truepars = np.array([6.5534, 31.55, 0.005235, 0.32322, 0.05232])
+    fluxes = observe_star(times, exptime, sigma, *truepars)
+    plt.plot(times, fluxes, ".")
+    plt.savefig("hotcold_data.png")
     ivars = np.zeros_like(fluxes) + 1. / (sigma ** 2)
     data = np.array([times, fluxes, ivars])
-    pars = np.array([6.5534, 31.55, 0.005235, 0.32322, 0.05232])
-    print ln_like(data, pars)
-    plt.plot(times, fluxes, ".")
-    plt.savefig("hotcold.png")
+    initpars = truepars
+    ndim, nwalkers = len(initpars), 128
+    pos = [initpars + 1e-5*np.random.randn(ndim) for i in range(nwalkers)]
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(data,))
+    sampler.run_mcmc(pos, 512)
+    
