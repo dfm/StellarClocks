@@ -1,5 +1,5 @@
-% This file is part of the StellarClocks project
-% Copyright 2014 David W. Hogg
+% This file is part of the StellarClocks project.
+% Copyright 2014 the authors.
 
 \documentclass[12pt, preprint]{aastex}
 
@@ -45,10 +45,11 @@ including massive exoplanets.
 Here we discuss the opportunities for using residuals in periodic
 transit timing to discover and characterize long-period exoplanet
 companions.
-The residuals are not the same as transit-timing variations, because
-they are not caused by gravitational perturbations on the planet; they
-are caused by the reflex motion of the host star around the extrasolar
-system barycenter induced by the long-period planet's orbit.
+The residuals do not have the same character as what are known as
+``transit-timing variations'', because they are not caused by
+gravitational perturbations on the planet; they are caused by the
+reflex motion of the host star around the extrasolar system barycenter
+induced by the long-period planet's orbit.
 We implement and demonstrate a method on real \Kepler\ data.  We find
 that we can detect exoplanet-induced timing residuals with amplitudes
 of $\sim XXX$~s in some typical systems with large, short-period
@@ -73,7 +74,31 @@ about the orbit as the radial velocity, but with different units.
 
 ...Connection to R\o mer and history.
 
-\section{Information in the data}
+\section{Signal generalities}
+
+...How, in general, the signal is to be found...
+
+...How precisely the signal can be found...
+Given a set of oscillation modes $m$ with oscillation periods $P_m$,
+our ability to find a long-period signal (meaning a signal which
+varies on time-scales much longer than the oscillation frequencies) of
+known functional form and amplitude $T_0$ (time units) is given
+roughly by:
+\begin{eqnarray}
+\frac{1}{\sigma_T^2} &\sim& \sum_m \frac{\DeltaTKepler^2}{P_m^4}\,\left(\frac{S}{N}\right)_m^2
+\quad ,
+\end{eqnarray}
+where $\sigma_T$ is the uncertainty on the amplitude $T_0$,
+$\DeltaTKepler$ is the lifetime of the \Kepler\ mission data, and
+$(S/N)_m$ is the signal-to-noise with which mode $m$ is detected.
+This formula assumes that the oscillations are more-or-less coherent
+over the lifetime of the mission, which appears to be true
+empirically.
+There is a pre-factor of order unity that depends on the functional
+form of the signal and other details.
+This precision estimate depends incredibly strongly on period:
+Much shorter periods are far more valuable.
+Hence the value of the millisecond pulsars!
 
 If you can measure the timing amplitude $T_0$, you get a measure of
 the line-of-sight semi-major axis projection $a\,\sin i$.
@@ -97,27 +122,6 @@ radial velocity function of time; anything that can be inferred from
 radial-velocity data can be inferred from time-delay data.
 That said, the sensitivities to noise will be different, and good
 inferences will require very good time-delay data.
-
-Given a set of oscillation modes $m$ with oscillation periods $P_m$,
-our ability to find a long-period signal (meaning a signal which
-varies on time-scales much longer than the oscillation frequencies) of
-known functional form and amplitude $T_0$ (time units) is given
-roughly by:
-\begin{eqnarray}
-\frac{1}{\sigma_T^2} &\sim& \sum_m \frac{\DeltaTKepler^2}{P_m^4}\,\left(\frac{S}{N}\right)_m^2
-\quad ,
-\end{eqnarray}
-where $\sigma_T$ is the uncertainty on the amplitude $T_0$,
-$\DeltaTKepler$ is the lifetime of the \Kepler\ mission data, and
-$(S/N)_m$ is the signal-to-noise with which mode $m$ is detected.
-This formula assumes that the oscillations are more-or-less coherent
-over the lifetime of the mission, which appears to be true
-empirically.
-There is a pre-factor of order unity that depends on the functional
-form of the signal and other details.
-This precision estimate depends incredibly strongly on period:
-Much shorter periods are far more valuable.
-Hence the value of the millisecond pulsars!
 
 \section{Methods}
 
