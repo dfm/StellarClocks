@@ -84,6 +84,19 @@ if __name__ == "__main__":
         low = 3 * len(chain) / 4
         nwalkers *= 2
         pos = chain[np.random.randint(low, high=len(chain), size=nwalkers)]
+
+        # plot samples
+        plt.clf()
+        plt.plot(times, 86400. * true_time_delays, "b-")
+        for ii in np.random.randint(len(sampler.flatchain), size=16):
+            time_delays = times - distort_times(times, *(sampler.flatchain[ii, 5:]))
+            plt.plot(times, 86400. * time_delays, "k-", alpha=0.25)
+        plt.xlabel("time (d)")
+        plt.ylabel("time delay (s)")
+        plt.savefig("hotcold_time_delays.png")
+
+        # triangle-plot samples
+        plt.clf()
         resids = (sampler.flatchain - truepars[None, :])
         resids[:, [0, 1, 3, 4, 6, 7]] *= 86400.
         resids[:, 2] *= 1.e6
@@ -94,11 +107,3 @@ if __name__ == "__main__":
                                       "A amplitude resid (s)", "B amplitude resid (s)"],
                               truths=(truepars - truepars))
         fig.savefig("hotcold_triangle.png")
-        plt.plot(times, 86400. * true_time_delays, "b-")
-        for ii in np.random.randint(len(sampler.flatchain), size=16):
-            time_delays = times - distort_times(times, *(sampler.flatchain[ii, 5:]))
-            plt.plot(times, 86400. * true_time_delays, "k-", alpha=0.25)
-        plt.xlabel("time (d)")
-        plt.ylabel("time delay (s)")
-        plt.savefig("hotcold_time_delays.png")
-
