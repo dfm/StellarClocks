@@ -72,9 +72,10 @@ if __name__ == "__main__":
     ivars = np.zeros_like(fluxes) + 1. / (sigma ** 2)
     data = np.array([times, fluxes, ivars])
     initpars = truepars
+    initpars[5:] = [365.25 * 12, 0., 0.] # MAGIC
     ndim, nwalkers = len(initpars), 16
     pos = [initpars + 1e-5*np.random.randn(ndim) for i in range(nwalkers)]
-    nburn = 6
+    nburn = 10
     for burn in range(nburn):
         nlinks = 64
         print "burning %d, ndim %d, nwalkers %d, nlinks %d" % (burn, ndim, nwalkers, nlinks)
@@ -82,7 +83,8 @@ if __name__ == "__main__":
         sampler.run_mcmc(pos, nlinks)
         chain = sampler.flatchain
         low = 3 * len(chain) / 4
-        nwalkers *= 2
+        if nwalkers < 512:
+            nwalkers *= 2
         pos = chain[np.random.randint(low, high=len(chain), size=nwalkers)]
 
         # plot samples
