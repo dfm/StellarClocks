@@ -23,7 +23,7 @@ def get_fractions(times, period, offset, depth, duration, gress):
 
 def distort_times(times, period, Aamp, Bamp):
     thetas = 2 * np.pi * times / period
-    return times - Aamp * np.cos(thetas) - Bamp * np.cos(thetas)
+    return times - Aamp * np.cos(thetas) - Bamp * np.sin(thetas)
 
 def integrate_fractions(times, exptime, hotperiod, offset, depth, duration, gress, coldperiod, Aamp, Bamp, K):
     delta_times = np.arange(-0.5 * exptime + 0.5 * exptime / K, 0.5 * exptime, exptime / K)
@@ -65,13 +65,15 @@ if __name__ == "__main__":
     truepars = np.array([hotperiod, 731.55, 0.005235, 0.32322, 0.05232, coldperiod, Aamp, Bamp]) # MAGIC
     true_time_delays = times - distort_times(times, *(truepars[5:]))
     fluxes = observe_star(times, exptime, sigma, *truepars)
+    fig1 = plt.figure(1)
+    plt.clf()
     plt.plot(times, fluxes, ".")
     plt.xlabel("time (d)")
     plt.ylabel("flux")
-    plt.savefig("hotcold_data.png")
+    fig1.savefig("hotcold_data.png")
     ivars = np.zeros_like(fluxes) + 1. / (sigma ** 2)
     data = np.array([times, fluxes, ivars])
-    initpars = truepars
+    initpars = 1. * truepars
     initpars[5:] = [365.25 * 12, 0., 0.] # MAGIC
     ndim, nwalkers = len(initpars), 16
     pos = [initpars + 1e-5*np.random.randn(ndim) for i in range(nwalkers)]
@@ -88,6 +90,7 @@ if __name__ == "__main__":
         pos = chain[np.random.randint(low, high=len(chain), size=nwalkers)]
 
         # plot samples
+        fig2 = plt.figure(2)
         plt.clf()
         plt.plot(times, 86400. * true_time_delays, "b-")
         for ii in np.random.randint(len(sampler.flatchain), size=16):
@@ -95,10 +98,9 @@ if __name__ == "__main__":
             plt.plot(times, 86400. * time_delays, "k-", alpha=0.25)
         plt.xlabel("time (d)")
         plt.ylabel("time delay (s)")
-        plt.savefig("hotcold_time_delays.png")
+        fig2.savefig("hotcold_time_delays.png")
 
         # triangle-plot samples
-        plt.clf()
         resids = (sampler.flatchain - truepars[None, :])
         resids[:, [0, 1, 3, 4, 6, 7]] *= 86400.
         resids[:, 2] *= 1.e6
