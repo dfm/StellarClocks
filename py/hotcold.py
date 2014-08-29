@@ -53,7 +53,7 @@ if __name__ == "__main__":
     times = np.arange(0., 4.1 * 365, 1.0 / 48.) # 30-min cadence in d
     exptime = ((1.0 / 24.) / 60.) * 27. # 27 min in d
     sigma = 1.e-5
-    truepars = np.array([6.5534, 31.55, 0.005235, 0.32322, 0.05232])
+    truepars = np.array([6.5534, 731.55, 0.005235, 0.32322, 0.05232])
     fluxes = observe_star(times, exptime, sigma, *truepars)
     plt.plot(times, fluxes, ".")
     plt.savefig("hotcold_data.png")
@@ -62,9 +62,9 @@ if __name__ == "__main__":
     initpars = truepars
     ndim, nwalkers = len(initpars), 16
     pos = [initpars + 1e-5*np.random.randn(ndim) for i in range(nwalkers)]
-    nburn = 5
+    nburn = 6
     for burn in range(nburn):
-        nlinks = 128
+        nlinks = 64
         print "burning %d, ndim %d, nwalkers %d, nlinks %d" % (burn, ndim, nwalkers, nlinks)
         sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_posterior, args=(data,))
         sampler.run_mcmc(pos, nlinks)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         low = 3 * len(chain) / 4
         nwalkers *= 2
         pos = chain[np.random.randint(low, high=len(chain), size=nwalkers)]
-    fig = triangle.corner(sampler.flatchain,
-                          labels=["period", "offset", "depth", "duration", "gress"],
-                          truths=truepars)
-    fig.savefig("hotcold_triangle.png")
+        fig = triangle.corner((sampler.flatchain - truepars[None, :]) * 86400., # seconds
+                              labels=["period", "offset", "depth", "duration", "gress"],
+                              truths=(truepars - truepars))
+        fig.savefig("hotcold_triangle.png")
