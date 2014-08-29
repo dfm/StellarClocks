@@ -23,7 +23,7 @@ def get_fractions(times, period, offset, depth, duration, gress):
 
 def distort_times(times, period, Aamp, Bamp):
     thetas = 2 * np.pi * times / period
-    return times + Aamp * np.cos(thetas) + Bamp * np.cos(thetas)
+    return times - Aamp * np.cos(thetas) - Bamp * np.cos(thetas)
 
 def integrate_fractions(times, exptime, hotperiod, offset, depth, duration, gress, coldperiod, Aamp, Bamp, K):
     delta_times = np.arange(-0.5 * exptime + 0.5 * exptime / K, 0.5 * exptime, exptime / K)
@@ -63,8 +63,11 @@ if __name__ == "__main__":
     Aamp = 2.34 / 86400. # MAGIC
     Bamp = 0.
     truepars = np.array([hotperiod, 731.55, 0.005235, 0.32322, 0.05232, coldperiod, Aamp, Bamp]) # MAGIC
+    true_time_delays = times - distort_times(times, *(truepars[5:]))
     fluxes = observe_star(times, exptime, sigma, *truepars)
     plt.plot(times, fluxes, ".")
+    plt.xlabel("time (d)")
+    plt.ylabel("flux")
     plt.savefig("hotcold_data.png")
     ivars = np.zeros_like(fluxes) + 1. / (sigma ** 2)
     data = np.array([times, fluxes, ivars])
@@ -91,3 +94,11 @@ if __name__ == "__main__":
                                       "A amplitude resid (s)", "B amplitude resid (s)"],
                               truths=(truepars - truepars))
         fig.savefig("hotcold_triangle.png")
+        plt.plot(times, 86400. * true_time_delays, "b-")
+        for ii in np.random.randint(len(sampler.flatchain), size=16):
+            time_delays = times - distort_times(times, *(sampler.flatchain[ii, 5:]))
+            plt.plot(times, 86400. * true_time_delays, "k-", alpha=0.25)
+        plt.xlabel("time (d)")
+        plt.ylabel("time delay (s)")
+        plt.savefig("hotcold_time_delays.png")
+
