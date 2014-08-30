@@ -3,7 +3,6 @@ This file is part of the StellarClocks project.
 Copyright 2014 David W. Hogg (NYU).
 
 # to-do items
-- turn on multiprocessing for emcee
 - fork the plotting
 - figure out real-data pre-processing or update likelihood function noise model
 - run on real data
@@ -70,12 +69,13 @@ if __name__ == "__main__":
     sigma = 1.e-5
     hotperiod = 6.5534 # MAGIC
     ln_coldperiod = np.log(365.25 * 11.8618) # MAGIC (Jupiter)
-    coldamp = 5.0 / 86400. # MAGIC (twice Jupiter's amplitude)
+    # http://www.google.com/search?q=((1+Jupiter+mass)+%2F+(1+Solar+mass))+*+((5.204267+AU)+%2F+c)
+    coldamp = 4. * 2.478 / 86400. # MAGIC (4 * Jupiter's amplitude in days)
     coldphase = 0.1 # radian MAGIC
     Aamp = coldamp * np.cos(coldphase)
     Bamp = coldamp * np.sin(coldphase)
-    truepars = np.array([hotperiod, 731.55, 0.005235, 0.32322, 0.05232, ln_coldperiod, Aamp, Bamp]) # MAGIC
-    true_time_delays = times - distort_times(times, *(truepars[5:]))
+    truepars = np.array([hotperiod, 2.55, 0.005235, 0.32322, 0.05232, ln_coldperiod, Aamp, Bamp]) # MAGIC
+    true_offsets = truepars[1] + times - distort_times(times, *(truepars[5:]))
     fluxes = observe_star(times, exptime, sigma, *truepars)
     fig1 = plt.figure(1)
     plt.clf()
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     nburn = 100
     for burn in range(nburn):
         print "burning %d, ndim %d, nwalkers %d, nlinks %d" % (burn, ndim, nwalkers, nlinks)
-        sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_posterior, args=(data,))
+        sampler = emcee.EnsembleSampler(nwalkers, ndim, ln_posterior, args=(data,), threads=17)
         sampler.run_mcmc(pos, nlinks)
         chain = sampler.flatchain
         low = 3 * len(chain) / 4
@@ -106,12 +106,16 @@ if __name__ == "__main__":
         # plot samples
         fig2 = plt.figure(2)
         plt.clf()
-        plt.plot(times, 86400. * true_time_delays, "b-")
+        plt.plot(times, 86400. * true_offsets, "b-")
         for ii in np.random.randint(len(sampler.flatchain), size=16):
-            time_delays = times - distort_times(times, *(sampler.flatchain[ii, 5:]))
-            plt.plot(times, 86400. * time_delays, "k-", alpha=0.25)
+            # HACK to plot offsets in a clean way, removing hotperiod and offset dependencies
+            # NOTE dependence on `truepars`
+            offsets = sampler.flatchain[ii, 1] \
+                + times - distort_times(times, *(sampler.flatchain[ii, 5:])) \
+                - (times - sampler.flatchain[ii, 1]) * (1. - truepars[0] / sampler.flatchain[ii, 0])
+            plt.plot(times, 86400. * offsets, "k-", alpha=0.25)
         plt.xlabel("time (d)")
-        plt.ylabel("time delay (s)")
+        plt.ylabel("offsets (s)")
         fig2.savefig("hotcold_time_delays.png")
 
         # triangle-plot samples
