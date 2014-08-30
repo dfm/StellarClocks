@@ -75,7 +75,7 @@ if __name__ == "__main__":
     Aamp = coldamp * np.cos(coldphase)
     Bamp = coldamp * np.sin(coldphase)
     truepars = np.array([hotperiod, 2.55, 0.005235, 0.32322, 0.05232, ln_coldperiod, Aamp, Bamp]) # MAGIC
-    true_offsets = truepars[1] + times - distort_times(times, *(truepars[5:]))
+    true_offsets = times - distort_times(times, *(truepars[5:]))
     fluxes = observe_star(times, exptime, sigma, *truepars)
     fig1 = plt.figure(1)
     plt.clf()
@@ -110,9 +110,9 @@ if __name__ == "__main__":
         for ii in np.random.randint(len(sampler.flatchain), size=16):
             # HACK to plot offsets in a clean way, removing hotperiod and offset dependencies
             # NOTE dependence on `truepars`
-            offsets = sampler.flatchain[ii, 1] \
+            offsets = (sampler.flatchain[ii, 1] - truepars[1]) \
                 + times - distort_times(times, *(sampler.flatchain[ii, 5:])) \
-                - (times - sampler.flatchain[ii, 1]) * (1. - truepars[0] / sampler.flatchain[ii, 0])
+                + (times - sampler.flatchain[ii, 1]) * (1. - truepars[0] / sampler.flatchain[ii, 0])
             plt.plot(times, 86400. * offsets, "k-", alpha=0.25)
         plt.xlabel("time (d)")
         plt.ylabel("offsets (s)")
