@@ -60,7 +60,7 @@ if __name__ == "__main__":
     sigma = 1.e-5
     hotperiod = 6.5534 # MAGIC
     coldperiod = 365.25 * 5.0 # MAGIC
-    Aamp = 2.34 / 86400. # MAGIC
+    Aamp = 12.34 / 86400. # MAGIC
     Bamp = 0.
     truepars = np.array([hotperiod, 731.55, 0.005235, 0.32322, 0.05232, coldperiod, Aamp, Bamp]) # MAGIC
     true_time_delays = times - distort_times(times, *(truepars[5:]))
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     ivars = np.zeros_like(fluxes) + 1. / (sigma ** 2)
     data = np.array([times, fluxes, ivars])
     initpars = 1. * truepars
-    initpars[5:] = [365.25 * 12, 0., 0.] # MAGIC
+    initpars[6:] = [0., 0.] # zero out amplitudes
     ndim, nwalkers = len(initpars), 16
     pos = [initpars + 1e-5*np.random.randn(ndim) for i in range(nwalkers)]
     nburn = 10
