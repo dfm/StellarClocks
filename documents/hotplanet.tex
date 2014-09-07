@@ -5,10 +5,11 @@
 
 \input{vc}
 \newcounter{affil}
+\newcommand{\sectionname}{Section}
 \newcommand{\project}[1]{\textsl{#1}}
 \newcommand{\Kepler}{\project{Kepler}}
+\newcommand{\tick}{\mathrm{tick}}
 \newcommand{\given}{\,|\,}
-\newcommand{\DeltaTKepler}{\Delta T_{\mathrm{Kep}}}
 
 \begin{document}
 
@@ -54,8 +55,8 @@ induced by the long-period planet's orbit.
 We implement and demonstrate a method on real \Kepler\ data.  We find
 that we can detect exoplanet-induced timing residuals with amplitudes
 of $\sim XXX$~s in some typical systems with large, short-period
-transiting planets (for context, Jupiter induces timing residuals in
-the Sun with a semi-amplitude of 2.3~s).
+transiting planets (for context, Jupiter induces in-plane timing residuals in
+the Sun with a semi-amplitude of 2.5~s).
 We perform a rudimentary search in NNN systems and discover YYY
 long-period exoplanet candidates.
 \end{abstract}
@@ -77,29 +78,88 @@ about the orbit as the radial velocity, but with different units.
 
 \section{Signal generalities}
 
-...How, in general, the signal is to be found...
+There are two qualitatively different methods for exoplanet discovery
+via timing with a precise stellar ``clock''.
+The first is to look at the ``clock rate'' and see that the clock runs
+faster as it approaches us, and slower as it recedes.
+This is very similar, in some sense, to the radial-velocity method for
+finding exoplanets; it is more sensitive to planets that induce larger
+reaction velocities in the parent star, because clock rate changes are
+driven by Doppler shifts.
+If all that is used is the \emph{rate} of the clock, not all of the
+information available is being exploited, because a precise clock has
+phase coherence over the time of the experiment.
 
-...How precisely the signal can be found...
-Given a set of oscillation modes $m$ with oscillation periods $P_m$,
-our ability to find a long-period signal (meaning a signal which
-varies on time-scales much longer than the oscillation frequencies) of
-known functional form and amplitude $T_0$ (time units) is given
-roughly by:
+The second method captures that phase coherence.
+It is to look at the timing residuals and see that the clock ``ticks''
+are retarded (relative to a purely periodic signal) when the clock is
+farther from us and advanced when the clock is closer.
+This method is more sensitive to planets that induce larger reaction
+\emph{displacements} in the parent star.
+This latter method---timing residuals---is going to be more sensitive
+in general, because it makes use of not just the frequency information
+(the clock rate) but also the phase information (the coherent,
+predictable arrival times of the transits).
+It is also more sensitive to the larger-period planets, which are hard
+to find by other methods.
+For these reasons, we use the timing-residuals method in what follows.
+
+In the method (below), we will find the signals by building a
+generative model of the full data stream; that is, we won't measure
+individual transit times explicitly.
+However, in this \sectionname, just for discussion purposes, let's
+imagine measuring a set of transit arrival times, that may have been
+distorted by a time-dependent displacement of the parent star.  What
+can be measured from such a signal, and how precisely can it be
+measured?
+The precision will depend on the properties of the star and the
+observing program; here we estimate precision for the
+\Kepler\ mission, but the analysis is generalizable.
+
+If a typical hot-Jupiter transit in a typical star observed by
+\Kepler\ lasts hours and is measured with a signal-to-noise of
+thousands, then we might hope to be able to measure the time of that
+transit (that clock ``tick'') to a precision $\delta t_\tick\sim
+10$~s, depending in detail on the shape of the transit, the cadence of
+the data, and the properties of the relevant noise sources (some of
+which are intrinsic to the star).
+A hot Jupiter might transit a hundred times $N_\tick\sim 100$ or
+several hundred times in the duration of the \Kepler\ mission, so the
+overall precision with which the equivalent, periodic clock could be
+synchronized is potentially better than
 \begin{eqnarray}
-\frac{1}{\sigma_T^2} &\sim& \sum_m \frac{\DeltaTKepler^2}{P_m^4}\,\left(\frac{S}{N}\right)_m^2
-\quad ,
+\delta t &\sim& \frac{\delta t_\tick}{\sqrt{N_\tick}}
+\\
+\delta t &\sim& 1~\mathrm{s}
+\quad .
 \end{eqnarray}
-where $\sigma_T$ is the uncertainty on the amplitude $T_0$,
-$\DeltaTKepler$ is the lifetime of the \Kepler\ mission data, and
-$(S/N)_m$ is the signal-to-noise with which mode $m$ is detected.
-This formula assumes that the oscillations are more-or-less coherent
-over the lifetime of the mission, which appears to be true
-empirically.
-There is a pre-factor of order unity that depends on the functional
-form of the signal and other details.
-This precision estimate depends incredibly strongly on period:
-Much shorter periods are far more valuable.
-Hence the value of the millisecond pulsars!
+This sets the rough precision of a hot-Jupiter clock in \Kepler:
+It should be useful for detecting exoplanet-induced timing drifts or
+variations that have amplitudes substantially larger than 1~s within
+the \Kepler\ mission.
+For context, in the Solar System, Jupiter induces in-plane timing
+residuals in the Sun with a semi-amplitude of 2.5~s.
+This also illustrates that clocks with shorter periods (higher
+$N_\tick$ in the mission lifetime) or sharper or louder ``ticks''
+(smaller $\delta t_\tick$) are more valuable.
+
+Of course this is naive in several respects: The first is that the
+timing residuals induced by an outer exoplanet are varying
+non-trivially with time; it should be easier to find signals that have
+a period comparable to (or shorter than) the \Kepler\ mission
+lifetime.
+That is, the $\delta t$ precision is only an order-of-magnitude
+estimate; it will be modified by the functional form of the timing
+distortion we seek.
+The second is that very long-period signals, even if they have large
+amplitude, will only be detectable as clock drifts if they show
+\emph{acceleration} (second derivative of displacement with time)
+inside the \Kepler\ mission window (otherwise their effects are
+equivalent to a non-varying period offset in the clock rate).
+Just as with radial-velocity exoplanet discovery; in the limit of
+large periods, it is only accelerations that are measureable.
+
+...fix next paragraphs to flow
 
 If you can measure the timing amplitude $T_0$, you get a measure of
 the line-of-sight semi-major axis projection $a\,\sin i$.
@@ -125,26 +185,6 @@ That said, the sensitivities to noise will be different, and good
 inferences will require very good time-delay data.
 
 \section{Method}
-
-There are two qualitatively different methods for exoplanet discovery
-via timing.
-The first is to look at the ``clock rate'' and see that the clock runs
-faster as it approaches us, and slower as it recedes.
-This is very similar, in some sense, to the radial-velocity method for
-finding exoplanets; it is more sensitive to planets that induce larger
-reaction velocities in the parent star.
-The second is to look at the timing residuals and see that the clock
-``ticks'' are retarded when the clock is farther from us and advanced
-when the clock is closer.
-This method is more sensitive to planets that induce larger reaction
-\emph{displacements} in the parent star.
-The latter method---timing residuals---is going to be more sensitive
-in general, because it makes use of not just the frequency information
-(the clock rate) but also the phase information (the coherent,
-predictable arrival times of the transits).
-It is also more sensitive to the larger-period planets, which are hard
-to find by other methods.
-For these reasons, we use the timing-residuals method in what follows.
 
 ...Likelihood function for a hot exoplanet
 
