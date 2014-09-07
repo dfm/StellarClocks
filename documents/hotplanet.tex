@@ -13,11 +13,12 @@
 \begin{document}
 
 \title{
-  Short-period exoplanets as clocks for long-period exoplanet discovery.
+  Using short-period transiting exoplanets as clocks \\
+  for long-period exoplanet discovery
 }
 \author{
-  David~W.~Hogg\altaffilmark{\ref{ccpp},\ref{cds},\ref{mpia},\ref{email}},
-  and
+  David~W.~Hogg\altaffilmark{\ref{ccpp},\ref{cds},\ref{mpia},\ref{email}}
+  \&
   Dan~Foreman-Mackey\altaffilmark{\ref{ccpp}}
 }
 \date{DRAFT VERSION / \texttt{\githash}\ / \today\ / NOT FOR DISTRIBUTION}
@@ -123,66 +124,33 @@ radial-velocity data can be inferred from time-delay data.
 That said, the sensitivities to noise will be different, and good
 inferences will require very good time-delay data.
 
-\section{Methods}
+\section{Method}
 
-Our general approach is to take periodograms of the data.
-The idea is that if we distort the time axis of the data---effectively
-``un-doing'' the time-delay effects created by the orbit of a
-planetary companion---the periodogram will get more informative as the
-distortion better matches the inverse of the time-delay distortion
-induced by reaction of the star to the movement of the planet.
-That is, the planet creates a time-delay pattern in the data; we un-do
-that pattern and watch the stellar oscillation modes get ``sharper''.
+There are two qualitatively different methods for exoplanet discovery
+via timing.
+The first is to look at the ``clock rate'' and see that the clock runs
+faster as it approaches us, and slower as it recedes.
+This is very similar, in some sense, to the radial-velocity method for
+finding exoplanets; it is more sensitive to planets that induce larger
+reaction velocities in the parent star.
+The second is to look at the timing residuals and see that the clock
+``ticks'' are retarded when the clock is farther from us and advanced
+when the clock is closer.
+This method is more sensitive to planets that induce larger reaction
+\emph{displacements} in the parent star.
+The latter method---timing residuals---is going to be more sensitive
+in general, because it makes use of not just the frequency information
+(the clock rate) but also the phase information (the coherent,
+predictable arrival times of the transits).
+It is also more sensitive to the larger-period planets, which are hard
+to find by other methods.
+For these reasons, we use the timing-residuals method in what follows.
 
-The method is based on the fact that a periodogram is related
-(beautifully) to a marginalized likelihood function
-(\citealt{bretthorst}):
-\begin{eqnarray}
-\ln p(d\given P_m) &=& \frac{C(P_m)}{\sigma^2} + \mbox{const}
-\quad,
-\end{eqnarray}
-where $p(d\given P_m)$ is a likelihood function, $d$ is the
-light-curve data on the target star, $P_m$ is the period of a putative
-sinusoidal signal---here an asteroseismology mode $m$---generating the
-data, $C(P_m)$ is the periodogram (best-fit squared amplitude as a
-function of period $P_m$) and $\sigma^2$ is the per-datum noise
-variance (assumed Gaussian, independent, and all identical).
-This is a \emph{marginalized} likelihood, because phase and amplitude
-have been marginalized out (with trivial prior pdfs); the likelihood
-depends only on period.
-The periodogram $C(P)$ is defined to be the square of the best-fit
-amplitude of a sinusoidal signal, with arbitrary phase but period $P$,
-fit by least squares to zero-mean data $d$.
-The data blob $d$ consists of a set of $N$ measurements $d_n$, each of
-which has a corresponding time $t_n$ and uncertainty (noise amplitude)
-$\sigma$.
-The time points are unevenly spaced in general; in practice we compute
-the periodogram by the standard procedure for unevenly-spaced data
-(CITE).
+...Likelihood function for a hot exoplanet
 
-...Figure XXX shows a blow-up of the periodogram of the \Kepler\ data
-on target star YYY near one of its modes.
+...Likelihood function for a hot planet with a cold-planet adjusting the timing.
 
-Of course we are not really looking for the modes at periods $P_m$;
-for our purposes, asteroseismology itself is a ``solved problem''.
-We are looking for a time-delay function $h(t\given \omega)$ such that
-if we un-delay the data by this function, each asteroseismology mode
-$m$ becomes more faithfully represented in the data.
-Here $\omega$ is the set of exoplanet parameters, which include a
-time-delay amplitude $T_0$, a period $P$, an eccentricity $e$, an
-argument of perhielion $\varpi$ and so on.
-For the purposes of what follows, we define here a distorted
-periodogram $C(P\given\omega)$ which is the periodogram obtained after
-moving each time point $t_n$ by a time displacement
-$-h(t_n\given\omega)$.
-This leads to our new likelihood function
-\begin{eqnarray}
-\ln p(d\given P_m, \omega) &=& \frac{C(P_m\given\omega)}{\sigma^2} + \mbox{const}
-\quad,
-\end{eqnarray}
-where $\omega$ is the blob of exoplanet parameters.
-
-This likelihood function---which is a function of mode period $P_m$
+...This likelihood function---which is a function of FIXME mode period $P_m$
 and exoplanet parameters $\omega$---can be optimized to generate a
 point estimate, or multiplied by a prior to make posterior inferences.
 Here we demonstrate feasibility with simple optimization (maximum

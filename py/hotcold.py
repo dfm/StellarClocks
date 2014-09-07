@@ -68,9 +68,9 @@ if __name__ == "__main__":
     exptime = ((1.0 / 24.) / 60.) * 27. # 27 min in d
     sigma = 1.e-5
     hotperiod = 6.5534 # MAGIC
-    ln_coldperiod = np.log(365.25 * 11.8618) # MAGIC (Jupiter)
+    ln_coldperiod = np.log(365.25 * 11.8618) # MAGIC (Jupiter's period in days)
     # http://www.google.com/search?q=((1+Jupiter+mass)+%2F+(1+Solar+mass))+*+((5.204267+AU)+%2F+c)
-    coldamp = 4. * 2.478 / 86400. # MAGIC (4 * Jupiter's amplitude in days)
+    coldamp = 2.478 / 86400. # MAGIC (Jupiter's amplitude in days)
     coldphase = 0.1 # radian MAGIC
     Aamp = coldamp * np.cos(coldphase)
     Bamp = coldamp * np.sin(coldphase)
@@ -83,6 +83,7 @@ if __name__ == "__main__":
     plt.xlabel("time (d)")
     plt.ylabel("flux")
     fig1.savefig("hotcold_data.png")
+    plt.close("all")
     ivars = np.zeros_like(fluxes) + 1. / (sigma ** 2)
     data = np.array([times, fluxes, ivars])
     initpars = 1. * truepars
@@ -129,3 +130,4 @@ if __name__ == "__main__":
                                       "A amplitude resid (s)", "B amplitude resid (s)"],
                               truths=(truepars - truepars))
         fig.savefig("hotcold_triangle.png")
+        plt.close("all")
