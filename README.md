@@ -15,3 +15,5 @@ that can be made with any other kinds of astronomical clocks (such as pulsars).
 Copyright 2014 the authors.
 **All rights reserved**.
 Currently not licensed for redistribution or reuse.
+
+Any scientific use of the content of this repository *requires citation*.
